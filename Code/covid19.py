@@ -55,6 +55,7 @@ df_Entities['Tasa de Cambio'] = Rates
 
 fig, axs = plt.subplots(nrows=2, ncols=1, figsize=(12, 8))
 df_Entities.plot.bar(x='Entidad', y='Incidencia Semanal Normalizada', color='C3', ax=axs[0])
+axs[0].set_title('Última actualización: '+pd.to_datetime('today') .strftime('%d-%m-%y'), fontsize=13)
 axs[0].set_xlabel('')
 axs[0].set_xticks([])
 axs[0].yaxis.set_tick_params(labelsize=13)
