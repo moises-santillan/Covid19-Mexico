@@ -69,4 +69,6 @@ axs[1].legend(fontsize=13)
 fig.tight_layout()
 fig.savefig('../docs/Fig01.png')
 
+os.system('Git "update"')
+
 os.system("rm "+file)
