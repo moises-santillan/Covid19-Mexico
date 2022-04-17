@@ -67,7 +67,7 @@ axs[1].xaxis.set_tick_params(labelsize=13)
 axs[1].yaxis.set_tick_params(labelsize=13)
 axs[1].legend(fontsize=13)
 fig.tight_layout()
-fig.savefig('../docs/Fig01.png')
+fig.savefig('../docs/Fig01.png', transparent=True)
 
 os.system("rm "+file)
 os.system('cd ..')
