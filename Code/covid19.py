@@ -48,8 +48,8 @@ for entity in Entities:
     dp = DeterministicProcess(df_Incidence[entity][:Lag-trst].index, constant=False, period=7, fourier=3)
     model_fit = AutoReg(df_Incidence[entity][:Lag-trst], lags=5, trend='n', seasonal=False, deterministic=dp).fit()
     predictions = model_fit.predict(start=Lag-trst, end=Lag-1)
-    Incidences.append(sum(predictions[-14:-7]))
-    Rates.append(sum(predictions[-14:-7])/sum(predictions[-21:-14]) - 1)
+    Incidences.append(sum(predictions[-10:-3]))
+    Rates.append(sum(predictions[-10:-3])/sum(predictions[-17:-10]) - 1)
 
 df_Entities['Incidencia Semanal'] = Incidences
 df_Entities['Incidencia Semanal Normalizada'] = df_Entities['Incidencia Semanal']/df_Entities['Población']*1e5
