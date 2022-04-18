@@ -87,7 +87,7 @@ fig.update_xaxes(showticklabels=False, title=None, row=1, col=1)
 fig.update_yaxes(title="Incidencia Semanal Normalizada", row=1, col=1)
 fig.update_yaxes(title="Tasa de Cambio", row=2, col=1)
 
-fig.show()
+#fig.show()
 fig.write_html("../docs/Fig01.html")
 
 os.system("rm "+file)
