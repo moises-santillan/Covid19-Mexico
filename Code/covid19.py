@@ -5,6 +5,7 @@ import plotly.express as px
 from plotly.subplots import make_subplots
 from statsmodels.tsa.ar_model import AutoReg
 from statsmodels.tsa.deterministic import DeterministicProcess
+from scipy.signal import savgol_filter
 
 def count_incidence(df, date, entity):
     if entity == 0:
@@ -13,47 +14,51 @@ def count_incidence(df, date, entity):
         ci = len(df.loc[(df.FECHA_SINTOMAS == str(date)) & (df.ENTIDAD_RES == entity)])
     return ci
 
-os.system("wget https://datosabiertos.salud.gob.mx/gobmx/salud/datos_abiertos/datos_abiertos_covid19.zip")
-os.system("unzip datos_abiertos_covid19.zip")
-os.system("rm datos_abiertos_covid19.zip")
+#os.system("wget https://datosabiertos.salud.gob.mx/gobmx/salud/datos_abiertos/datos_abiertos_covid19.zip")
+#os.system("unzip datos_abiertos_covid19.zip")
+#os.system("rm datos_abiertos_covid19.zip")
 
 file = (pd.to_datetime('today') - pd.Timedelta('1 days')).strftime('%y%m%d')+"COVID19MEXICO.csv" #Database file
 Lag = 72 #10 weeks into the past
 Date_Range = pd.date_range(end=pd.to_datetime('today').date(), periods=Lag)
 
-df = pd.read_csv(file, engine="python")
-columns = list(df.columns)
-columns.remove('ENTIDAD_RES')
-columns.remove('FECHA_SINTOMAS')
-columns.remove('CLASIFICACION_FINAL')
-df = df.drop(columns=columns)
-df = df.drop(df[pd.to_datetime(df.FECHA_SINTOMAS) < Date_Range[0]].index)
-df = df.drop(df[df.CLASIFICACION_FINAL > 3].index)
-df = df.drop(columns=['CLASIFICACION_FINAL'])
+#df = pd.read_csv(file, engine="python")
+#columns = list(df.columns)
+#columns.remove('ENTIDAD_RES')
+#columns.remove('FECHA_SINTOMAS')
+#columns.remove('CLASIFICACION_FINAL')
+#df = df.drop(columns=columns)
+#df = df.drop(df[pd.to_datetime(df.FECHA_SINTOMAS) < Date_Range[0]].index)
+#df = df.drop(df[df.CLASIFICACION_FINAL > 3].index)
+#df = df.drop(columns=['CLASIFICACION_FINAL'])
 
 df_Entities = pd.read_csv("../Data/Entidades.csv")
 
-df_Incidence = pd.DataFrame({'Date':Date_Range})
-for entity in range(33):
-    Incidence = []
-    for date in range(Lag):
-        Incidence.append(count_incidence(df, str(Date_Range[date].date()), entity) )
-    df_Incidence[df_Entities.iloc[entity, 0]] = Incidence
+#df_Incidence = pd.DataFrame({'Date':Date_Range})
+#for entity in range(33):
+#    Incidence = []
+#    for date in range(Lag):
+#        Incidence.append(count_incidence(df, str(Date_Range[date].date()), entity) )
+#    df_Incidence[df_Entities.iloc[entity, 0]] = Incidence
+
+#df_Incidence.to_csv("../Data/Incidence.csv", index=False)
+df_Incidence = pd.read_csv("../Data/Incidence.csv")
 
 Entities = list(df_Entities.Entidad)
 Incidences = []
 Rates = []
-trst = 17
+trst = 14
 for entity in Entities:
-    dp = DeterministicProcess(df_Incidence[entity][:Lag-trst].index, constant=False, period=7, fourier=3)
-    model_fit = AutoReg(df_Incidence[entity][:Lag-trst], lags=5, trend='n', seasonal=False, deterministic=dp).fit()
+    result = savgol_filter(df_Incidence[entity], 21, 2)
+    model_fit = AutoReg(result[:-trst], lags=7, trend='c').fit()
     predictions = model_fit.predict(start=Lag-trst, end=Lag-1)
-    Incidences.append(sum(predictions[-10:-3]))
-    Rates.append(sum(predictions[-10:-3])/sum(predictions[-17:-10]) - 1)
+    Incidences.append(sum(predictions[-7:]))
+    Rates.append(sum(predictions[-7:])/sum(predictions[-14:-7]) - 1)
 
 df_Entities['Incidencia Semanal'] = Incidences
 df_Entities['Incidencia Semanal Normalizada'] = df_Entities['Incidencia Semanal']/df_Entities['Población']*1e5
 df_Entities['Tasa de Cambio'] = Rates
+
 
 
 fig, axs = plt.subplots(nrows=2, ncols=1, figsize=(12, 8))
@@ -70,7 +75,7 @@ axs[1].xaxis.set_tick_params(labelsize=13)
 axs[1].yaxis.set_tick_params(labelsize=13)
 axs[1].legend(fontsize=13)
 fig.tight_layout()
-fig.savefig('../docs/Fig01.png', transparent=True)
+fig.savefig('../docs/Fig01.png')
 
 
 
