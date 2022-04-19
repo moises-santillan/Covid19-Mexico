@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import plotly.express as px
 from plotly.subplots import make_subplots
 from statsmodels.tsa.ar_model import AutoReg
-from statsmodels.tsa.deterministic import DeterministicProcess
+
 from scipy.signal import savgol_filter
 
 def count_incidence(df, date, entity):
@@ -14,35 +14,35 @@ def count_incidence(df, date, entity):
         ci = len(df.loc[(df.FECHA_SINTOMAS == str(date)) & (df.ENTIDAD_RES == entity)])
     return ci
 
-#os.system("wget https://datosabiertos.salud.gob.mx/gobmx/salud/datos_abiertos/datos_abiertos_covid19.zip")
-#os.system("unzip datos_abiertos_covid19.zip")
-#os.system("rm datos_abiertos_covid19.zip")
+os.system("wget https://datosabiertos.salud.gob.mx/gobmx/salud/datos_abiertos/datos_abiertos_covid19.zip")
+os.system("unzip datos_abiertos_covid19.zip")
+os.system("rm datos_abiertos_covid19.zip")
 
 file = (pd.to_datetime('today') - pd.Timedelta('1 days')).strftime('%y%m%d')+"COVID19MEXICO.csv" #Database file
-Lag = 72 #10 weeks into the past
+Lag = 100#10 weeks into the past
 Date_Range = pd.date_range(end=pd.to_datetime('today').date(), periods=Lag)
 
-#df = pd.read_csv(file, engine="python")
-#columns = list(df.columns)
-#columns.remove('ENTIDAD_RES')
-#columns.remove('FECHA_SINTOMAS')
-#columns.remove('CLASIFICACION_FINAL')
-#df = df.drop(columns=columns)
-#df = df.drop(df[pd.to_datetime(df.FECHA_SINTOMAS) < Date_Range[0]].index)
-#df = df.drop(df[df.CLASIFICACION_FINAL > 3].index)
-#df = df.drop(columns=['CLASIFICACION_FINAL'])
+df = pd.read_csv(file, engine="python")
+columns = list(df.columns)
+columns.remove('ENTIDAD_RES')
+columns.remove('FECHA_SINTOMAS')
+columns.remove('CLASIFICACION_FINAL')
+df = df.drop(columns=columns)
+df = df.drop(df[pd.to_datetime(df.FECHA_SINTOMAS) < Date_Range[0]].index)
+df = df.drop(df[df.CLASIFICACION_FINAL > 3].index)
+df = df.drop(columns=['CLASIFICACION_FINAL'])
 
 df_Entities = pd.read_csv("../Data/Entidades.csv")
 
-#df_Incidence = pd.DataFrame({'Date':Date_Range})
-#for entity in range(33):
-#    Incidence = []
-#    for date in range(Lag):
-#        Incidence.append(count_incidence(df, str(Date_Range[date].date()), entity) )
-#    df_Incidence[df_Entities.iloc[entity, 0]] = Incidence
+df_Incidence = pd.DataFrame({'Date':Date_Range})
+for entity in range(33):
+    Incidence = []
+    for date in range(Lag):
+        Incidence.append(count_incidence(df, str(Date_Range[date].date()), entity) )
+    df_Incidence[df_Entities.iloc[entity, 0]] = Incidence
 
-#df_Incidence.to_csv("../Data/Incidence.csv", index=False)
-df_Incidence = pd.read_csv("../Data/Incidence.csv")
+df_Incidence.to_csv("../Data/Incidence.csv", index=False)
+#df_Incidence = pd.read_csv("../Data/Incidence.csv")
 
 Entities = list(df_Entities.Entidad)
 Incidences = []
