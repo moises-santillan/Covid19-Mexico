@@ -54,7 +54,7 @@ df_Nowcasting = pd.DataFrame()
 df_Nowcasting["Date"] = df_Incidence["Date"]
 trst = 12
 loc = (pd.to_datetime(df['FECHA_INGRESO'])-pd.to_datetime(df['FECHA_SINTOMAS'])).mean().total_seconds()/3600/24 + 3
-scale = (pd.to_datetime(df['FECHA_INGRESO'])-pd.to_datetime(df['FECHA_SINTOMAS'])).std().total_seconds()/3600/24
+scale = (pd.to_datetime(df['FECHA_INGRESO'])-pd.to_datetime(df['FECHA_SINTOMAS'])).std().total_seconds()/3600/24 + 1
 for entity in Entities:
     aux = df_Incidence[entity].rolling(5, center=True).mean()
     aux[[0, 1, Lag-2, Lag-1]] = df_Incidence[entity][[0, 1, Lag-2, Lag-1]]
