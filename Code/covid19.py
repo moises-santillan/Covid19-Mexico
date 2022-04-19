@@ -14,44 +14,44 @@ def count_incidence(df, date, entity):
         ci = len(df.loc[(df.FECHA_SINTOMAS == str(date)) & (df.ENTIDAD_RES == entity)])
     return ci
 
-os.system("wget https://datosabiertos.salud.gob.mx/gobmx/salud/datos_abiertos/datos_abiertos_covid19.zip")
-os.system("unzip datos_abiertos_covid19.zip")
-os.system("rm datos_abiertos_covid19.zip")
+#os.system("wget https://datosabiertos.salud.gob.mx/gobmx/salud/datos_abiertos/datos_abiertos_covid19.zip")
+#os.system("unzip datos_abiertos_covid19.zip")
+#os.system("rm datos_abiertos_covid19.zip")
 
 file = (pd.to_datetime('today') - pd.Timedelta('1 days')).strftime('%y%m%d')+"COVID19MEXICO.csv" #Database file
 Lag = 100#10 weeks into the past
 Date_Range = pd.date_range(end=pd.to_datetime('today').date(), periods=Lag)
 
-df = pd.read_csv(file, engine="python")
-columns = list(df.columns)
-columns.remove('ENTIDAD_RES')
-columns.remove('FECHA_SINTOMAS')
-columns.remove('CLASIFICACION_FINAL')
-df = df.drop(columns=columns)
-df = df.drop(df[pd.to_datetime(df.FECHA_SINTOMAS) < Date_Range[0]].index)
-df = df.drop(df[df.CLASIFICACION_FINAL > 3].index)
-df = df.drop(columns=['CLASIFICACION_FINAL'])
+#df = pd.read_csv(file, engine="python")
+#columns = list(df.columns)
+#columns.remove('ENTIDAD_RES')
+#columns.remove('FECHA_SINTOMAS')
+#columns.remove('CLASIFICACION_FINAL')
+#df = df.drop(columns=columns)
+#df = df.drop(df[pd.to_datetime(df.FECHA_SINTOMAS) < Date_Range[0]].index)
+#df = df.drop(df[df.CLASIFICACION_FINAL > 3].index)
+#df = df.drop(columns=['CLASIFICACION_FINAL'])
 
 df_Entities = pd.read_csv("../Data/Entidades.csv")
 
-df_Incidence = pd.DataFrame({'Date':Date_Range})
-for entity in range(33):
-    Incidence = []
-    for date in range(Lag):
-        Incidence.append(count_incidence(df, str(Date_Range[date].date()), entity) )
-    df_Incidence[df_Entities.iloc[entity, 0]] = Incidence
+#df_Incidence = pd.DataFrame({'Date':Date_Range})
+#for entity in range(33):
+#    Incidence = []
+#    for date in range(Lag):
+#        Incidence.append(count_incidence(df, str(Date_Range[date].date()), entity) )
+#    df_Incidence[df_Entities.iloc[entity, 0]] = Incidence
 
-df_Incidence.to_csv("../Data/Incidence.csv", index=False)
-#df_Incidence = pd.read_csv("../Data/Incidence.csv")
+#df_Incidence.to_csv("../Data/Incidence.csv", index=False)
+df_Incidence = pd.read_csv("../Data/Incidence.csv")
 
 Entities = list(df_Entities.Entidad)
 Incidences = []
 Rates = []
-trst = 14
+trst = 12
 for entity in Entities:
     result = savgol_filter(df_Incidence[entity], 21, 2)
     model_fit = AutoReg(result[:-trst], lags=7, trend='c').fit()
-    predictions = model_fit.predict(start=Lag-trst, end=Lag-1)
+    predictions = model_fit.predict(start=Lag-2*trst, end=Lag-1)
     Incidences.append(sum(predictions[-7:]))
     Rates.append(sum(predictions[-7:])/sum(predictions[-14:-7]) - 1)
 
