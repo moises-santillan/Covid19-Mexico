@@ -56,8 +56,8 @@ trst = 12
 loc = (pd.to_datetime(df['FECHA_INGRESO'])-pd.to_datetime(df['FECHA_SINTOMAS'])).mean().total_seconds()/3600/24 + 3
 scale = (pd.to_datetime(df['FECHA_INGRESO'])-pd.to_datetime(df['FECHA_SINTOMAS'])).std().total_seconds()/3600/24 + 1
 for entity in Entities:
-    aux = df_Incidence[entity].rolling(5, center=True).mean()
-    aux[[0, 1, Lag-2, Lag-1]] = df_Incidence[entity][[0, 1, Lag-2, Lag-1]]
+    aux = df_Incidence[entity].rolling(3, center=True).mean()
+    aux[[0, Lag-1]] = df_Incidence[entity][[0, Lag-1]]
     aux /= norm.cdf(range(Lag-1, -1, -1), loc=loc, scale=scale)
     df_Nowcasting[entity] = aux
 
@@ -65,8 +65,8 @@ for entity in Entities:
 Incidences = []
 Rates = []
 for entity in Entities:
-    Incidences.append(df_Nowcasting[entity][Lag-10:-3].sum())
-    Rates.append(df_Nowcasting[entity][Lag-10:-3].sum() / df_Nowcasting[entity][Lag-17:Lag-10].sum() - 1)
+    Incidences.append(df_Nowcasting[entity][Lag-11:-4].sum())
+    Rates.append(df_Nowcasting[entity][Lag-11:-4].sum() / df_Nowcasting[entity][Lag-18:Lag-11].sum() - 1)
 df_Entities["Incidencia Semanal"] = Incidences
 df_Entities['Tasa de Cambio'] = Rates
 df_Entities["Incidencia Semanal Normalizada"] = df_Entities["Incidencia Semanal"] / df_Entities["Población"] * 1e5
