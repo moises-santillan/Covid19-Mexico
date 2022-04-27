@@ -20,7 +20,7 @@ def count_incidence(df, date, entity):
 os.system("wget https://datosabiertos.salud.gob.mx/gobmx/salud/datos_abiertos/datos_abiertos_covid19.zip")
 os.system("unzip datos_abiertos_covid19.zip")
 os.system("rm datos_abiertos_covid19.zip")
-file = (pd.to_datetime('today') - pd.Timedelta('1 days')).strftime('%y%m%d')+"COVID19MEXICO.csv" #Database file
+file = (pd.to_datetime('today') - pd.Timedelta('2 days')).strftime('%y%m%d')+"COVID19MEXICO.csv" #Database file
 df = pd.read_csv(file, engine="python")
 os.system("rm "+file)
 
