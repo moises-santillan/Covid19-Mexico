@@ -17,7 +17,9 @@ def count_incidence(df, date, entity):
 
 
 
-os.system("wget -O datos_abiertos_covid19.zip -i https://datosabiertos.salud.gob.mx/gobmx/salud/datos_abiertos/historicos/2022/04/datos_abiertos_covid19_26.04.2022.zip")
+date = pd.to_datetime('today') - pd.Timedelta('1 days')
+path = "https://datosabiertos.salud.gob.mx/gobmx/salud/datos_abiertos/historicos/20"+date.strftime('%y/%m/')+"datos_abiertos_covid19_"+date.strftime('%d.%m.20%y.zip')
+os.system("wget -O datos_abiertos_covid19.zip -i " + path)
 os.system("unzip datos_abiertos_covid19.zip")
 os.system("rm datos_abiertos_covid19.zip")
 file = (pd.to_datetime('today') - pd.Timedelta('1 days')).strftime('%y%m%d')+"COVID19MEXICO.csv" #Database file
