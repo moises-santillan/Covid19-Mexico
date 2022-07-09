@@ -71,13 +71,13 @@ Rates = []
 for entity in Entities:
     Incidences.append(df_Nowcasting[entity][Lag-18:-4].sum())
     Rates.append(df_Nowcasting[entity][Lag-18:-4].sum() / df_Nowcasting[entity][Lag-32:Lag-18].sum() - 1)
-df_Entities["Incidencia Semanal"] = Incidences
+df_Entities["Incidencia Quincenal"] = Incidences
 df_Entities['Tasa de Cambio'] = Rates
-df_Entities["Incidencia Semanal Normalizada"] = df_Entities["Incidencia Semanal"] / df_Entities["Población"] * 1e5
+df_Entities["Incidencia Quincenal Normalizada"] = df_Entities["Incidencia Quincenal"] / df_Entities["Población"] * 1e5
 
 
 fig, axs = plt.subplots(nrows=2, ncols=1, figsize=(12, 8))
-df_Entities.plot.bar(x='Entidad', y='Incidencia Semanal Normalizada', color='C3', ax=axs[0])
+df_Entities.plot.bar(x='Entidad', y='Incidencia Quincenal Normalizada', color='C3', ax=axs[0])
 axs[0].set_title('Última actualización: '+pd.to_datetime('today').strftime('%d-%m-%y'), fontsize=13)
 axs[0].set_xlabel('')
 axs[0].set_xticks([])
@@ -94,7 +94,7 @@ fig.savefig('docs/Fig01.png')
 
 
 
-fig1 = px.bar(df_Entities, x='Entidad', y='Incidencia Semanal Normalizada')
+fig1 = px.bar(df_Entities, x='Entidad', y='Incidencia Quincenal Normalizada')
 fig2 = px.bar(df_Entities, x='Entidad', y='Tasa de Cambio')
 fig = make_subplots(rows=2, cols=1)
 fig.add_trace(fig1['data'][0], row=1, col=1)
@@ -103,7 +103,7 @@ fig.update_layout(title_text="Útlima actialización: "+pd.to_datetime('today') 
     height=600
     )
 fig.update_xaxes(showticklabels=False, title=None, row=1, col=1)
-fig.update_yaxes(title="Incidencia Semanal Normalizada", row=1, col=1)
+fig.update_yaxes(title="Incidencia Quincenal Normalizada", row=1, col=1)
 fig.update_yaxes(title="Tasa de Cambio", row=2, col=1)
 fig.write_html("docs/Fig01.html")
 
